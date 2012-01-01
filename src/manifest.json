@@ -1,0 +1,20 @@
+{
+  "name": "my first extension",
+  "version": "1.0",
+  "description": "first",
+  "icons":{
+    "default_icon": "icon.png"
+  },
+  "app":{
+    "launch": {
+      "local_path":"main.html"
+    }
+  },
+  "permissions":[
+    "http://api.flickr.com/",
+    "notifications",
+    "unlimitedStorage"
+
+  ]
+
+}
