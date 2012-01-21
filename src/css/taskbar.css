@@ -1,0 +1,25 @@
+@CHARSET "UTF-8";
+
+#task-bar
+{
+	
+}
+
+#task-table
+{
+	
+}
+
+div.table-row
+{	
+	display:table-row;
+}
+
+div.cell-priority, div.cell-name, div.cell-elapsed-time, div.cell-btn
+{
+	
+	display:table-cell;
+}
+
+
+

@@ -1,17 +1,29 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <html> <head>
 <title>time tracker</title>
+<!-- css style -->
+<link rel="stylesheet" href="css/main.css">
+<link rel="stylesheet" href="css/button.css">
+<link rel="stylesheet" href="css/flatbutton.css">
+<link rel="stylesheet" href="css/linkbutton.css">
+<link rel="stylesheet" href="css/taskbar.css">
 </head>
 
 <body>
 <h1>this is a time tracker</h1>
-<div>timer:</div>
+<div id="board"></div>
+<script src="lib/goog/base.js"></script>
+<script src="app-dep.js"></script>
+<script src="js/main_UI.js"></script>
+<script src="js/soundmanager2.js"></script>
 
-<div>buttons:
-</div>
+<script>
+	
+	var UI = new chr.myApp.mainUI(goog.dom.getElement("board"));
+</script>
 
-<div>textInput
-</div>
+
+
 
 <hr>
 <address></address>
