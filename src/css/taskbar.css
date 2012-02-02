@@ -1,25 +1,109 @@
 @CHARSET "UTF-8";
 
+
+
+
+#timer-board
+{
+	//float: left;
+    //width: 670px;
+}
+
+
 #task-bar
 {
 	
+	min-height:300px;
+	 //background: url('../images/light_blue_bg.jpeg');
+	 background-color:whitesmoke;
 }
+
 
 #task-table
 {
-	
+	width:100%;	
+	color: #575757;
+	border-collapse: collapse;
+	border-spacing: 0;
+	cursor: pointer;
+	empty-cells: show;
+	border: 1px solid #CACACA;
 }
 
-div.table-row
-{	
-	display:table-row;
-}
-
-div.cell-priority, div.cell-name, div.cell-elapsed-time, div.cell-btn
+#task-add
 {
 	
-	display:table-cell;
+}
+
+.add-text
+{
+	width:200px;
+	margin-right:5px;	
+}
+
+div.note-bar
+{
+
+}
+
+div.leftSide
+{
+	width: 60%;
+	display: inline;
+	float: left;
+	clear: right;	
+	margin: 5px;
+	padding:5px;
+	background-color:white;
+
+}
+
+div.rightSide
+{
+	width: 35%;
+	display: inline;
+	clear: right;
+	float:left;
+	margin: 5px;
+	padding:5px;
+	
+	background-color:white;
 }
 
 
+tr.table-row
+{	
+	border-bottom: 1px solid #CACACA;
+    height: 32px;
+    
+
+}
+
+td.cell-priority, td.cell-name, td.cell-elapsed-time
+{
+	padding-left: .5em;
+	padding-right: .5em;
+	vertical-align:center;
+}
+
+td.cell-btn
+{
+	text-align:right;
+	padding:5px;
+	
+}
+
+.note-area
+{
+	min-height:150px;
+	min-width:200px;
+}
+
+div.task-status{
+	height:30px;
+	background-color: whiteSmoke;
+	//background:url('../images/light_blue_bg.jpeg');
+	padding:5px;
+	text-align: center;
+}
 

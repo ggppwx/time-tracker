@@ -7,6 +7,7 @@ goog.require('chr.myApp.timerUI');
 goog.require('chr.myApp.buttonsUI');
 goog.require('chr.myApp.settingUI');
 goog.require('chr.myApp.taskUI');
+goog.require('goog.ui.Dialog');
 
 var DEFAULT_SETTING = {
 		'workTime': [0,25],
@@ -39,27 +40,32 @@ chr.myApp.mainUI= function(node){
 	//TODO read database. 
 	this._taskBarDom = goog.dom.createDom('div',{id:'task-bar'});
 	this._taskUI = new chr.myApp.taskUI(this._taskBarDom);
-	goog.dom.appendChild(node,this._taskBarDom);
+	
 	
 	
 	this._timerBarDom = goog.dom.createDom('div',{id:'timer-bar'});
 	this._timerUI = new chr.myApp.timerUI(this._timerBarDom, mySetting );
 	goog.dom.appendChild(node, this._timerBarDom);
-	
+	goog.dom.appendChild(node,this._taskBarDom);
 	//this._btnBarDom = goog.dom.createDom('div',{id:'btn-bar'});
 	//this._btnUI = new chr.myApp.buttonsUI(this._btnBarDom);
 	//goog.dom.appendChild(node, this._btnBarDom);
-	
+	/*
 	this._settingBarDom = goog.dom.createDom('div', {id:'setting-bar'});
 	this._settingUI = new chr.myApp.settingUI(this._settingBarDom);
 	goog.dom.appendChild(node, this._settingBarDom);
-	
+	*/
 	
 	var settingBtnDom = goog.dom.createDom('div',{id:'setting-btn'});
+	/*
 	this._setBtn = new goog.ui.Button('set');
 	this._setBtn.render(settingBtnDom);
-	goog.dom.appendChild(node, settingBtnDom);
+	*/
+	this._setting = new goog.ui.Button('setting', goog.ui.LinkButtonRenderer.getInstance());
+	this._setting.render(settingBtnDom);
 	
+	goog.dom.appendChild(node, settingBtnDom);
+	/*
 	var handleSetBtn = function(e){
 		// set the button.
 		goog.dom.removeChildren(self._timerBarDom);
@@ -77,6 +83,38 @@ chr.myApp.mainUI= function(node){
 		}
 	};
 	goog.events.listen(this._setBtn, goog.ui.Component.EventType.ACTION, handleSetBtn);
+	*/
+	
+	var handleSetting = function(e){
+		var dialog = new goog.ui.Dialog();
+		dialog.setTitle('setting');
+		var settingUI = new chr.myApp.settingUI(dialog.getContentElement());
+		var buttonSet = new goog.ui.Dialog.ButtonSet();
+		buttonSet.addButton({ caption: 'Set', key: 'set' }, true, true);
+		buttonSet.addButton({ caption: 'Cancel', key: 'cancel' }, true, true);
+		dialog.setButtonSet(buttonSet);
+		goog.events.listen(dialog, goog.ui.Dialog.EventType.SELECT,function(e){
+			if(e.key === 'set'){
+				
+				var workTime = settingUI.getWorkTime();
+				var breakTime = settingUI.getBreakTime();
+				var longBreakTime = settingUI.getLongBreakTime();
+				if(workTime !== null && breakTime !== null && longBreakTime != null){
+					var setting ={
+							'workTime':workTime,
+							'breakTime': breakTime,
+							'longBreakTime':longBreakTime
+					};
+					localStorage["setting"] = JSON.stringify(setting);
+					goog.dom.removeChildren(self._timerBarDom);
+					self._timerUI = new chr.myApp.timerUI(self._timerBarDom, setting);
+				}
+			}
+		});
+		
+		dialog.setVisible(true);
+	};
+	goog.events.listen(this._setting, goog.ui.Component.EventType.ACTION, handleSetting);
 	
 	// listen to task bar 
 	goog.events.listen(this._taskUI, 'TASK_EVENT',

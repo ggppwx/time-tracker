@@ -44,7 +44,7 @@ chr.myApp.taskDB.prototype.open = function(){
 chr.myApp.taskDB.prototype.createTable = function(){
 	this.tasks.webdb.db.transaction(function(tx) {
 	    tx.executeSql('CREATE TABLE IF NOT EXISTS ' + 
-	                  'tasks(ID INTEGER PRIMARY KEY ASC, name TEXT, priority INTEGER, eTime INTEGER, active Yes)', []);
+	                  'tasks(ID INTEGER PRIMARY KEY ASC, name TEXT, priority INTEGER, eTime INTEGER, active Yes, note TEXT)', []);
 	  });
 };
 
@@ -52,11 +52,12 @@ chr.myApp.taskDB.prototype.createTable = function(){
 /*
  * add data to database 
  * */
-chr.myApp.taskDB.prototype.addData = function(nameText, priorityInt, eTimeInt){
+chr.myApp.taskDB.prototype.addData = function(nameText, priorityInt, eTimeInt, noteText){
+	noteText = noteText || "";
 	 this.tasks.webdb.db.transaction(function(tx){
 		    //var addedOn = new Date();
-		    tx.executeSql('INSERT INTO tasks(name, priority, eTime, active) VALUES (?,?,?,?)', 
-		        [nameText, priorityInt, eTimeInt,true],
+		    tx.executeSql('INSERT INTO tasks(name, priority, eTime, active, note) VALUES (?,?,?,?,?)', 
+		        [nameText, priorityInt, eTimeInt,true,noteText],
 		        this.onSuccess,
 		        this.onError);
 		    });
@@ -78,7 +79,8 @@ chr.myApp.taskDB.prototype.getAllTasks = function(){
 				  'name':row.name,
 				  'priority':row.priority,
 				  'eTime':chr.myApp.taskDB.convertTime(row.eTime),
-				  'active':row.active
+				  'active':row.active,
+				  'note':row.note
 			  });
 			  
 		}
@@ -119,20 +121,23 @@ chr.myApp.taskDB.prototype.delTaskById = function(id){
  * return an task object 
  * */
 chr.myApp.taskDB.prototype.getTaskById = function(id){
-	
 };
+
+
 
 /*
  * set task data by id 
  * */
-chr.myApp.taskDB.prototype.setTaskById = function(id,name,priority,eTime){
+
+chr.myApp.taskDB.prototype.setTaskById = function(id,name,priority,eTime,note){
 	//TODO update the database. 
 	this.tasks.webdb.db.transaction(function(tx) {
-	    tx.executeSql('UPDATE tasks SET name=?, priority=?,eTime=? WHERE ID=?', [name, priority,eTime,id],
+	    tx.executeSql('UPDATE tasks SET name=?, priority=?,eTime=?,note=? WHERE ID=?', [name, priority,eTime,id,note],
 	        this.onSuccess,
 	        this.onError);
 	  });
 };
+
 
 chr.myApp.taskDB.prototype.setTaskNameById = function(id,name){
 	//TODO update the database. 
@@ -144,7 +149,7 @@ chr.myApp.taskDB.prototype.setTaskNameById = function(id,name){
 };
 
 chr.myApp.taskDB.prototype.setTaskPriorityById = function(id,priority){
-	//TODO update the database. 
+	// update the database. 
 	this.tasks.webdb.db.transaction(function(tx) {
 	    tx.executeSql('UPDATE tasks SET priority=? WHERE ID=?', [priority, id],
 	        this.onSuccess,
@@ -153,7 +158,7 @@ chr.myApp.taskDB.prototype.setTaskPriorityById = function(id,priority){
 };
 
 chr.myApp.taskDB.prototype.setTaskEtimeById = function(id,eTime){
-	//TODO update the database. 
+	// update the database. 
 	this.tasks.webdb.db.transaction(function(tx) {
 	    tx.executeSql('UPDATE tasks SET eTime=? WHERE ID=?', [eTime, id],
 	        this.onSuccess,
@@ -162,7 +167,7 @@ chr.myApp.taskDB.prototype.setTaskEtimeById = function(id,eTime){
 };
 
 chr.myApp.taskDB.prototype.setActiveById = function(id,activeBool){
-	//TODO update the database. 
+	// update the database. 
 	this.tasks.webdb.db.transaction(function(tx) {
 	    tx.executeSql('UPDATE tasks SET active=? WHERE ID=?', [activeBool, id],
 	        this.onSuccess,
@@ -170,6 +175,13 @@ chr.myApp.taskDB.prototype.setActiveById = function(id,activeBool){
 	  });
 };
 
+chr.myApp.taskDB.prototype.setNoteById = function(id, noteText){
+	this.tasks.webdb.db.transaction(function(tx) {
+	    tx.executeSql('UPDATE tasks SET note=? WHERE ID=?', [noteText, id],
+	        this.onSuccess,
+	        this.onError);
+	  });
+};
 
 /*
  * error

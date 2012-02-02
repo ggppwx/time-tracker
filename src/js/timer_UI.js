@@ -46,12 +46,13 @@ chr.myApp.timerUI = function(node,setting){
 	this._isBreaking = false;
 	
 	this._taskStatusDom = goog.dom.createDom('div',{id:'task-status'});
-	goog.dom.appendChild(node, this._taskStatusDom);
+	//goog.dom.appendChild(node, this._taskStatusDom);
+	//TODO task-status has 
 	
-	this._timerStatusDom = goog.dom.createDom('div',{id:'timer-status'});
-	var status = this._workTime[0]+':'+this._workTime[1]
-		+'-'+this._breakTime[0]+':'+this._breakTime[1]
-		+'-'+this._longBreakTime[0]+':'+this._longBreakTime[1];
+	this._timerStatusDom = goog.dom.createDom('div',{id:'timer-status','class':'textCenter'});
+	var status = 'work time: '+this._workTime[0]+'h'+this._workTime[1]
+		+'m -------- break time: '+this._breakTime[0]+'h'+this._breakTime[1]
+		+'m -------- long break time: '+this._longBreakTime[0]+'h'+this._longBreakTime[1]+'m';
 	goog.dom.setTextContent(this._timerStatusDom,status);
 	goog.dom.appendChild(node,this._timerStatusDom);
 	
@@ -90,7 +91,7 @@ chr.myApp.timerUI = function(node,setting){
 	goog.dom.appendChild(toolBarDom, workBtnDom);
 	goog.dom.classes.add(toolBarDom,"buttons");
 	goog.dom.appendChild(node, toolBarDom);
-	
+	goog.dom.appendChild(node, this._taskStatusDom);
 	
 
 	// button handlers
@@ -332,21 +333,21 @@ chr.myApp.timerUI.prototype._reset = function(){
 	clearInterval(selfRef._inID);
 	goog.dom.setTextContent(selfRef._timerBoardDom, "0:0:0");
 	selfRef._boardTime = new Date();
-	
-	//TODO change the elapsed time and send task to mainUI 
-	selfRef._currTask.eTime.h = selfRef._taskTime.getHours();
-	selfRef._currTask.eTime.m = selfRef._taskTime.getMinutes();
-	selfRef._currTask.eTime.s = selfRef._taskTime.getSeconds();
-	//TODO send event 
-	var event = {
-			type:'TIME_OVER_EVENT',
-			'id':selfRef._currTask.id,
-			'name':selfRef._currTask.name,
-			'eTime':selfRef._currTask.eTime,
-			'priority':selfRef._currTask.priority
-	};
-	selfRef.dispatchEvent(event);
-	
+	if(selfRef._isWorking){
+		// change the elapsed time and send task to mainUI 
+		selfRef._currTask.eTime.h = selfRef._taskTime.getHours();
+		selfRef._currTask.eTime.m = selfRef._taskTime.getMinutes();
+		selfRef._currTask.eTime.s = selfRef._taskTime.getSeconds();
+		// send event 
+		var event = {
+				type:'TIME_OVER_EVENT',
+				'id':selfRef._currTask.id,
+				'name':selfRef._currTask.name,
+				'eTime':selfRef._currTask.eTime,
+				'priority':selfRef._currTask.priority
+		};
+		selfRef.dispatchEvent(event);
+	}
 	this._workBtn.setEnabled(true);
 	this._pauseBtn.setEnabled(false);
 	this._breakBtn.setEnabled(true);
