@@ -95,7 +95,7 @@ chr.myApp.taskUI = function(node){
 	 * */
 	var refresh = function(e){
 		// e.tasks comes from task DB. 
-		console.log(e.tasks);
+		// console.log(e.tasks);
 		self._tasks = e.tasks;
 		self._populateTable(self._tasks, self._taskTableDom);
 	};

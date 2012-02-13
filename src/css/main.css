@@ -338,12 +338,12 @@ div.footer li.menuItem a img:hover
 }
 
 
-＃timer-bar{
-	float: left;
-	width: 670px;
+#timer-bar
+{
 }
 
-#task-status{
+#task-status
+{
 	height:30px;
 	background-color: whiteSmoke;
 	//background:url('../images/light_blue_bg.jpeg');

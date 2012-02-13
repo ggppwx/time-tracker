@@ -2,7 +2,6 @@
 
 goog.provide('chr.myApp.mainUI');
 
-
 goog.require('chr.myApp.timerUI');
 goog.require('chr.myApp.buttonsUI');
 goog.require('chr.myApp.settingUI');
@@ -12,7 +11,8 @@ goog.require('goog.ui.Dialog');
 var DEFAULT_SETTING = {
 		'workTime': [0,25],
 		'breakTime': [0,5],
-		'longBreakTime':[0,30]
+		'longBreakTime':[0,30],
+		'longBreakInter':4
 };
 
 
@@ -63,8 +63,7 @@ chr.myApp.mainUI= function(node){
 	*/
 	this._setting = new goog.ui.Button('setting', goog.ui.LinkButtonRenderer.getInstance());
 	this._setting.render(settingBtnDom);
-	
-	goog.dom.appendChild(node, settingBtnDom);
+
 	/*
 	var handleSetBtn = function(e){
 		// set the button.
@@ -99,11 +98,14 @@ chr.myApp.mainUI= function(node){
 				var workTime = settingUI.getWorkTime();
 				var breakTime = settingUI.getBreakTime();
 				var longBreakTime = settingUI.getLongBreakTime();
+				var longBreakInter = parseInt(settingUI.getInterval());
+				alert(longBreakInter);
 				if(workTime !== null && breakTime !== null && longBreakTime != null){
 					var setting ={
 							'workTime':workTime,
 							'breakTime': breakTime,
-							'longBreakTime':longBreakTime
+							'longBreakTime':longBreakTime,
+							'longBreakInter':longBreakInter
 					};
 					localStorage["setting"] = JSON.stringify(setting);
 					goog.dom.removeChildren(self._timerBarDom);
@@ -115,6 +117,31 @@ chr.myApp.mainUI= function(node){
 		dialog.setVisible(true);
 	};
 	goog.events.listen(this._setting, goog.ui.Component.EventType.ACTION, handleSetting);
+	
+		
+	var muteTickDom = goog.dom.createDom('div',{id: 'mute-tick'});
+	this._muteCheckBox = new goog.ui.Checkbox();
+	this._muteCheckBox.render(muteTickDom);
+	goog.dom.append(muteTickDom,'mute tick sound');
+	
+	goog.dom.appendChild(node, settingBtnDom);
+	goog.dom.appendChild(node, muteTickDom);
+	var handleMuteChange = function(e){
+		// TODO handle mute
+		if(self._muteCheckBox.getChecked()){
+			// mute tick sound
+			if(!self._timerUI.setTickSound(false)){
+				self._muteCheckBox.setChecked(false);
+			}			
+		}else{
+			if(!self._timerUI.setTickSound(true)){
+				self._muteCheckBox.setChecked(true);
+			}
+			
+		}
+	};
+	goog.events.listen(this._muteCheckBox,goog.ui.Component.EventType.CHANGE,handleMuteChange);
+	
 	
 	// listen to task bar 
 	goog.events.listen(this._taskUI, 'TASK_EVENT',
@@ -153,14 +180,14 @@ chr.myApp.mainUI.prototype._handleTimerOver = function(e){
 	var name = e.name;
 	var eTime = e.eTime;
 	var priority = e.priority;
-	alert('elapsed time'+eTime.h+'-'+eTime.m+'-'+eTime.s);
+	// alert('elapsed time'+eTime.h+'-'+eTime.m+'-'+eTime.s);
 	var task = {
 			'id': id,
 			'priority': priority,
 			'name':name,
 			'eTime':eTime
 	};
-	
+	console.log(task);
 	this._taskUI.setTask(id, task);
-	
+	this._timerUI.setTask(task);
 };

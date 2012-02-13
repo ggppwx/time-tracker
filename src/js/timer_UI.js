@@ -11,23 +11,16 @@ goog.require('goog.ui.FlatButtonRenderer');
 
 chr.myApp.timerUI = function(node,setting){
 	goog.base(this);
-	var self = this;	
-	soundManager.onready(function(){
-		self._workEndSound = soundManager.createSound({
-			 id: 'workEndSound',
-			 url: 'sounds/rain.mp3'
-		});
-		self._breakEndSound = soundManager.createSound({
-			 id: 'breakEndSound',
-			 url: 'sounds/rain.mp3'
-		});
-	}
-	);
+	var self = this;
+	
+	this.initSound();
+	this._tickSound = true; 	//init tick sound, in default is true
 	
 	//TODO task information. 
 	this._currTask = null;
 	
-	
+	this._workCount = 0;
+	this._longBreakInter = setting.longBreakInter;
 	
 	this._today = new Date();
 	this._inID;
@@ -38,7 +31,7 @@ chr.myApp.timerUI = function(node,setting){
 	this._breakTime = setting.breakTime;
 	this._longBreakTime = setting.longBreakTime;
 	
-	this._breakCount = 0;
+
 	
 	// time board status
 	this._isWorking = false;
@@ -47,7 +40,7 @@ chr.myApp.timerUI = function(node,setting){
 	
 	this._taskStatusDom = goog.dom.createDom('div',{id:'task-status'});
 	//goog.dom.appendChild(node, this._taskStatusDom);
-	//TODO task-status has 
+	//task-status has 
 	
 	this._timerStatusDom = goog.dom.createDom('div',{id:'timer-status','class':'textCenter'});
 	var status = 'work time: '+this._workTime[0]+'h'+this._workTime[1]
@@ -110,13 +103,18 @@ chr.myApp.timerUI = function(node,setting){
 			selfRef._pauseBtn.setContent('pause');
 			selfRef._workBtn.setContent('work');
 			
-			//TODO set time
+			//set time
 			var hour = selfRef._workTime[0];
 			var min = selfRef._workTime[1];
-			
+			// start playing tick
+			if(selfRef._tickSound){
+				// playing tick.
+				selfRef.playTickSound();
+			}
 			selfRef._startCountDown(hour,min,0);
+			
 		}
-		soundManager.stopAll();
+		//soundManager.stopAll();
 	};
 	
 	var handlePauseBtn = function(e){
@@ -133,6 +131,8 @@ chr.myApp.timerUI = function(node,setting){
 			selfRef._pauseBtn.setContent('resume');
 			selfRef._workBtn.setContent('restart');
 			selfRef._workBtn.setEnabled(true);
+			//stop playing all sound 
+			selfRef.stopAllSound();
 		}else{
 			// if not working 
 			if(selfRef._isPaused){
@@ -143,9 +143,14 @@ chr.myApp.timerUI = function(node,setting){
 				selfRef._pauseBtn.setContent('pause');
 				selfRef._workBtn.setContent('work');
 				selfRef._workBtn.setEnabled(false);
+				//start to play tick sound 
+				if(selfRef._tickSound){
+					selfRef.playTickSound();	
+				}
+				
 			}
 		}
-		soundManager.stopAll();
+		//soundManager.stopAll();
 		
 	};
 	
@@ -159,7 +164,7 @@ chr.myApp.timerUI = function(node,setting){
 			selfRef._isBreaking = true;
 			selfRef._workBtn.setEnabled(false);
 			selfRef._pauseBtn.setEnabled(false);
-			
+			selfRef._breakBtn.setEnabled(false);
 			var hour = selfRef._breakTime[0];
 			var min = selfRef._breakTime[1];
 			selfRef._startCountDown(hour,min,0);
@@ -177,10 +182,12 @@ chr.myApp.timerUI = function(node,setting){
 			return;
 		}
 		if(!selfRef._isWorking && !selfRef._isBreaking && !selfRef._isPaused){
-			selfRef._breakCount = 0;
+			selfRef._workCount = 0;
 			selfRef._isBreaking = true;
 			selfRef._workBtn.setEnabled(false);
 			selfRef._pauseBtn.setEnabled(false);
+			selfRef._breakBtn.setEnabled(false);
+			selfRef._longBreakBtn.setEnabled(false);
 			
 			var hour = selfRef._longBreakTime[0];
 			var min = selfRef._longBreakTime[1];
@@ -199,6 +206,8 @@ chr.myApp.timerUI = function(node,setting){
 			alert('no task specified');
 			return;
 		}
+		selfRef._pauseBtn.setContent('pause');
+		selfRef._workBtn.setContent('work');	
 		selfRef._reset();
 		selfRef._isWorking = false;
 		selfRef._isPaused = false;
@@ -257,18 +266,18 @@ chr.myApp.timerUI.prototype._startCountDown = function(hour,min,sec){
 	selfRef._boardTime = new Date();  
 	selfRef._boardTime.setHours(hour, min, sec);
 	
-	//TODO set the initial task, get from task info.
-	selfRef._taskTime = new Date();
-	var h = selfRef._currTask.eTime.h;
-	var m = selfRef._currTask.eTime.m;
-	var s = selfRef._currTask.eTime.s;
-	selfRef._taskTime.setHours(h, m, s);
-	
+	//set the initial task, get from task info.
+	if(!selfRef._isPaused){ //if not paused
+		selfRef._taskTime = new Date();
+		var h = selfRef._currTask.eTime.h;
+		var m = selfRef._currTask.eTime.m;
+		var s = selfRef._currTask.eTime.s;
+		selfRef._taskTime.setHours(h, m, s);
+	}
 	
 	var countSec = -1;
 	
 	var timeCount = function(){
-		
 		//convert boardTime to board time 
 		var h = selfRef._boardTime.getHours();
 		var m = selfRef._boardTime.getMinutes();
@@ -286,6 +295,8 @@ chr.myApp.timerUI.prototype._startCountDown = function(hour,min,sec){
 		//show time left on board 
 		var timerStates = h+':'+m+':'+s;
 		goog.dom.setTextContent(selfRef._timerBoardDom, timerStates);
+		goog.dom.setTextContent(selfRef._taskStatusDom, 
+				selfRef._currTask.name+'--'+selfRef._taskTime.getHours()+':'+selfRef._taskTime.getMinutes()+':'+selfRef._taskTime.getSeconds());
 		//t=setTimeout("timeCount()",1000);
 		// minus 1 in each loop
 		selfRef._boardTime.setTime(selfRef._boardTime.getTime() - 1*1000);
@@ -333,7 +344,12 @@ chr.myApp.timerUI.prototype._reset = function(){
 	clearInterval(selfRef._inID);
 	goog.dom.setTextContent(selfRef._timerBoardDom, "0:0:0");
 	selfRef._boardTime = new Date();
-	if(selfRef._isWorking){
+	
+	//  BUGS solved here.   
+	if(selfRef._isWorking || selfRef._isPaused){  	
+		selfRef._isWorking = false;
+		selfRef._isPaused = false;
+		
 		// change the elapsed time and send task to mainUI 
 		selfRef._currTask.eTime.h = selfRef._taskTime.getHours();
 		selfRef._currTask.eTime.m = selfRef._taskTime.getMinutes();
@@ -364,6 +380,7 @@ chr.myApp.timerUI.prototype._finishCountDown = function(){
 	
 	if(selfRef._isWorking){
 		// finish work
+		selfRef._workCount++;
 		var status = 'time to break';
 		goog.dom.setTextContent(selfRef._timerBoardDom, status);
 		selfRef._isWorking = false;
@@ -371,16 +388,16 @@ chr.myApp.timerUI.prototype._finishCountDown = function(){
 		selfRef._pauseBtn.setEnabled(false);
 		// enable break button 
 		selfRef._breakBtn.setEnabled(true);
-		if(selfRef._breakCount >= 4){
+		if(selfRef._workCount >= selfRef._longBreakInter){
 			selfRef._longBreakBtn.setEnabled(true);
 		}
 		selfRef._workBtn.setEnabled(true);
 		
-		//TODO change the task elapse time 
+		// change the task elapse time 
 		selfRef._currTask.eTime.h = selfRef._taskTime.getHours();
 		selfRef._currTask.eTime.m = selfRef._taskTime.getMinutes();
 		selfRef._currTask.eTime.s = selfRef._taskTime.getSeconds();
-		//TODO send the task info to mainUI
+		// send the task info to mainUI
 		var event = {
 				type:'TIME_OVER_EVENT',
 				'id':selfRef._currTask.id,
@@ -390,27 +407,21 @@ chr.myApp.timerUI.prototype._finishCountDown = function(){
 		};
 		selfRef.dispatchEvent(event);
 		
-		// play break sound 
-		selfRef._workEndSound.play({
-			loops:10,
-			volume:300
-		});
+		// play break sound
+		selfRef.playWorkEndSound();
+		
 
 	}else{
 		if(selfRef._isBreaking){
 			// finish break
-			selfRef._breakCount++;
+			//selfRef._breakCount++;
 			var status = 'time to work';
 			goog.dom.setTextContent(selfRef._timerBoardDom, status);
 			selfRef._isBreaking = false;
 			selfRef._workBtn.setEnabled(true);
 			selfRef._pauseBtn.setEnabled(false);
 			
-			//TODO  play sound 
-			selfRef._breakEndSound.play({
-				loops:10,
-				volume:300
-			});
+			selfRef.playBreakEndSound();
 		}
 		
 	}
@@ -428,13 +439,82 @@ chr.myApp.timerUI.prototype.setTask = function(task){
 	var self = this;
 	if(!this._isWorking && !this._isPaused){
 		this._currTask = task;
-		//TODO change the task status
+		//change the task status
 		goog.dom.setTextContent(this._taskStatusDom,task.name+'--'+task.eTime.h+':'+task.eTime.m+':'+task.eTime.s);
 	}else{
 		alert('task can not be changed');
 	}
 };
 
+
+
+/*
+ * init the sound manager.
+ * */
+chr.myApp.timerUI.prototype.initSound = function(){
+	var self = this;
+	soundManager.onready(function(){
+		var workEndSound = soundManager.createSound({
+			id: 'workEndSound',
+			url: 'sounds/mozart.mp3'
+		});
+		var breakEndSound = soundManager.createSound({
+			id: 'breakEndSound',
+			url: 'sounds/rain.mp3'
+		});
+		var tickSound = soundManager.createSound({
+			id:'tickSound',
+			url:'sounds/clock-ticking-4.mp3'
+		});
+		self._sound = {
+			'workEndSound':workEndSound,
+			'breakEndSound':breakEndSound,
+			'tickSound':tickSound
+		};
+	}
+	);
+};
+
+chr.myApp.timerUI.prototype.playWorkEndSound = function(){
+	var self = this;
+	soundManager.stopAll();
+	self._sound.workEndSound.play({
+		loops:1,
+		volume:100
+	});
+};
+
+chr.myApp.timerUI.prototype.playBreakEndSound = function(){
+	var self = this;
+	soundManager.stopAll();
+	self._sound.breakEndSound.play({
+		loops:10,
+		volume:100
+	});
+};
+
+chr.myApp.timerUI.prototype.playTickSound = function(){
+	var self = this;
+	soundManager.stopAll();
+	self._sound.tickSound.play({
+		loops:100000000,
+		volume:200
+	});
+};
+
+chr.myApp.timerUI.prototype.stopAllSound = function(){
+	soundManager.stopAll();
+};
+
+
+chr.myApp.timerUI.prototype.setTickSound = function(enabled){
+	if(this._isWorking){
+		alert('cannot change during working');
+		return false;
+	}
+	this._tickSound = enabled;
+	return true;
+};
 
 
 

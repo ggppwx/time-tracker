@@ -2,7 +2,7 @@
 // Please do not edit.
 goog.addDependency('../../js/buttons_UI.js', ['chr.myApp.buttonsUI'], ['goog.dom', 'goog.events', 'goog.events.EventType', 'goog.ui.Button']);
 goog.addDependency('../../js/main_UI.js', ['chr.myApp.mainUI'], ['chr.myApp.buttonsUI', 'chr.myApp.settingUI', 'chr.myApp.taskUI', 'chr.myApp.timerUI', 'goog.ui.Dialog']);
-goog.addDependency('../../js/setting_UI.js', ['chr.myApp.settingUI'], ['goog.dom', 'goog.events', 'goog.events.EventType', 'goog.ui.Button', 'goog.ui.LabelInput']);
+goog.addDependency('../../js/setting_UI.js', ['chr.myApp.settingUI'], ['goog.dom', 'goog.events', 'goog.events.EventType', 'goog.ui.Button', 'goog.ui.Checkbox', 'goog.ui.Checkbox.State', 'goog.ui.ComboBox', 'goog.ui.ComboBoxItem', 'goog.ui.LabelInput']);
 goog.addDependency('../../js/task_DB.js', ['chr.myApp.taskDB'], ['goog.events']);
 goog.addDependency('../../js/task_UI.js', ['chr.myApp.taskUI'], ['chr.myApp.taskDB', 'goog.dom', 'goog.dom.classes', 'goog.editor.Table', 'goog.events', 'goog.ui.Button', 'goog.ui.FlatButtonRenderer', 'goog.ui.LabelInput', 'goog.ui.LinkButtonRenderer', 'goog.ui.Textarea']);
 goog.addDependency('../../js/timer_UI.js', ['chr.myApp.timerUI'], ['goog.dom', 'goog.dom.classes', 'goog.events', 'goog.events.EventType', 'goog.ui.Button', 'goog.ui.FlatButtonRenderer']);

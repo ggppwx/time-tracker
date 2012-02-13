@@ -48,6 +48,7 @@ div.note-bar
 
 div.leftSide
 {
+	min-height:200px;
 	width: 60%;
 	display: inline;
 	float: left;
@@ -83,7 +84,7 @@ td.cell-priority, td.cell-name, td.cell-elapsed-time
 {
 	padding-left: .5em;
 	padding-right: .5em;
-	vertical-align:center;
+	vertical-align:middle;
 }
 
 td.cell-btn
